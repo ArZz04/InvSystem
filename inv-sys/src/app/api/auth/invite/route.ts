@@ -27,12 +27,15 @@ export async function POST(req: NextRequest) {
     const body = await req.json();
     const { role: roleNumber, email } = body;
 
+    console.log("Received invite request for email:", email, "with role number:", roleNumber);
+
     if (roleNumber === undefined || !(roleNumber in roleMap)) {
       return Response.json({ error: "Invalid role number" }, { status: 400 });
     }
     if (!email) {
       return Response.json({ error: "Missing email" }, { status: 400 });
     }
+
 
     const role = roleMap[roleNumber];
 

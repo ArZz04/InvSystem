@@ -1,5 +1,8 @@
 "use client"
 import { useEffect, useState } from "react"
+import Modal from "@/app/components/Modal"
+import EmployeeForm from "./EmployeeForm"
+import EmployeeInvite from "./EmployeeInvite"
 
 type Employee = {
   id: string
@@ -31,6 +34,10 @@ export default function EmployeesPage() {
   const [currentPage, setCurrentPage] = useState(1)
   const [totalPages, setTotalPages] = useState(1)
   const [totalUsers, setTotalUsers] = useState(0)
+
+  const [isModalOpen, setIsModalOpen] = useState(false)
+  const [selectedEmployee, setSelectedEmployee] = useState<Employee | null>(null)
+  const [modalMode, setModalMode] = useState<"add" | "edit" | "invite">("add");
 
   useEffect(() => {
     const fetchEmployees = async () => {
@@ -105,15 +112,86 @@ export default function EmployeesPage() {
     setCurrentPage(1) // Reset to first page when filtering
   }
 
+  const handleCreateInvite = () => {
+    setSelectedEmployee(null)
+    setModalMode("invite")
+    setIsModalOpen(true)
+  }
+
+  const handleEditEmployee = (employee: Employee) => {
+    setSelectedEmployee(employee)
+    setModalMode("edit")
+    setIsModalOpen(true)
+  }
+
+  const handleAddEmployee = () => {
+    setSelectedEmployee(null)
+    setModalMode("add")
+    setIsModalOpen(true)
+  }
+
+  const handleCloseModal = () => {
+    setIsModalOpen(false)
+    setSelectedEmployee(null)
+  }
+
+  const handleFormSubmit = async (data: Partial<Employee>) => {
+    console.log("[v0] Form submitted:", data, "Mode:", modalMode)
+    // TODO: Implement API calls for create/update
+
+    // Simulate API call
+    try {
+      if (modalMode === "edit" && selectedEmployee) {
+        console.log("[v0] Updating employee:", selectedEmployee.id, data)
+        // Update API call here
+      } else {
+        console.log("[v0] Creating new employee:", data)
+        // Create API call here
+      }
+
+      handleCloseModal()
+      // Refresh the employee list
+      // fetchEmployees() - this would trigger the useEffect
+    } catch (error) {
+      console.error("[v0] Error submitting form:", error)
+    }
+  }
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-gray-900 to-slate-800 p-6">
       <div className="max-w-7xl mx-auto">
-        <div className="mb-8">
-          <h1 className="text-4xl font-bold bg-gradient-to-r from-blue-400 via-purple-500 to-pink-500 bg-clip-text text-transparent mb-2">
-            Gestión de Empleados
-          </h1>
-          <p className="text-gray-400">Administra y visualiza la información de tu equipo</p>
-        </div>
+       <div className="mb-8 flex items-center justify-between">
+  <div>
+    <h1 className="text-4xl font-bold bg-gradient-to-r from-blue-400 via-purple-500 to-pink-500 bg-clip-text text-transparent mb-2">
+      Gestión de Empleados
+    </h1>
+    <p className="text-gray-400">Administra y visualiza la información de tu equipo</p>
+  </div>
+
+  <div className="flex items-center space-x-4">
+    {/* Botón compacto para invitación */}
+    <button
+      onClick={handleCreateInvite}
+      className="p-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-lg hover:from-blue-500 hover:to-indigo-500 hover:shadow-lg hover:shadow-blue-500/25 transform hover:scale-105 transition-all duration-300"
+      title="Generar Invitación"
+    >
+      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+      </svg>
+    </button>
+
+    {/* Botón normal para agregar empleado */}
+    <button
+      onClick={handleAddEmployee}
+      className="px-6 py-3 bg-gradient-to-r from-green-600 to-emerald-600 text-white font-medium rounded-xl hover:from-green-500 hover:to-emerald-500 hover:shadow-lg hover:shadow-green-500/25 transform hover:scale-105 transition-all duration-300 flex items-center space-x-2"
+    >
+      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+      </svg>
+      <span>Agregar Empleado</span>
+    </button>
+  </div>
+</div>
 
         <div className="bg-gradient-to-r from-slate-800/50 to-gray-800/50 backdrop-blur-sm rounded-2xl p-6 mb-8 border border-gray-700/50 shadow-2xl">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
@@ -198,7 +276,7 @@ export default function EmployeesPage() {
               <table className="w-full">
                 <thead>
                   <tr className="bg-gradient-to-r from-slate-700/50 to-gray-700/50 border-b border-gray-600/50">
-                    <th className="px-6 py-4 text-left text-sm font-semibold text-gray-200">#</th>
+                    <th className="px-6 py-4 text-center text-sm font-semibold text-gray-200">#</th>
                     <th className="px-6 py-4 text-left text-sm font-semibold text-gray-200">Usuario</th>
                     <th className="px-6 py-4 text-left text-sm font-semibold text-gray-200">Nombre</th>
                     <th className="px-6 py-4 text-left text-sm font-semibold text-gray-200">Apellido P.</th>
@@ -206,6 +284,7 @@ export default function EmployeesPage() {
                     <th className="px-6 py-4 text-left text-sm font-semibold text-gray-200">Email</th>
                     <th className="px-6 py-4 text-left text-sm font-semibold text-gray-200">Rol</th>
                     <th className="px-6 py-4 text-left text-sm font-semibold text-gray-200">Estado</th>
+                    <th className="px-6 py-4 text-left text-sm font-semibold text-gray-200"></th>
                   </tr>
                 </thead>
                 <tbody>
@@ -245,6 +324,21 @@ export default function EmployeesPage() {
                         >
                           {emp.status ? "Activo" : "Inactivo"}
                         </span>
+                      </td>
+                      <td className="px-6 py-4">
+                        <button
+                          onClick={() => handleEditEmployee(emp)}
+                          className="px-3 py-2 bg-gradient-to-r from-blue-600 to-purple-600 text-white text-xs font-medium rounded-lg hover:from-blue-500 hover:to-purple-500 hover:shadow-lg hover:shadow-blue-500/25 transform hover:scale-105 transition-all duration-300 flex items-center space-x-1"
+                        >
+                          <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth={2}
+                              d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
+                            />
+                          </svg>
+                        </button>
                       </td>
                     </tr>
                   ))}
@@ -343,6 +437,28 @@ export default function EmployeesPage() {
           </div>
         )}
       </div>
+
+      <Modal
+  isOpen={isModalOpen}
+  onClose={handleCloseModal}
+  title={
+    modalMode === "edit"
+      ? "Editar Empleado"
+      : modalMode === "invite"
+      ? "Generar Invitación"
+      : "Agregar Nuevo Empleado"
+  }
+>
+  {modalMode === "invite" ? (
+    <EmployeeInvite onClose={handleCloseModal} />
+  ) : (
+    <EmployeeForm
+      employee={selectedEmployee}
+      onSubmit={handleFormSubmit}
+      onCancel={handleCloseModal}
+    />
+  )}
+</Modal>
     </div>
   )
 }
