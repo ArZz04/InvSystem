@@ -46,9 +46,13 @@ export async function POST(req: NextRequest) {
       JWT_SECRET,
       { expiresIn: "1h" }, // duración del token
     );
+    console.log("Generated JWT:", token);
 
     // Devolver token
-    return new Response(JSON.stringify({ token, username: user.username, role: user.role }), { status: 200 });
+    return new Response(
+      JSON.stringify({ token, username: user.username, role: user.role }),
+      { status: 200 },
+    );
   } catch (error) {
     console.error(error);
     return new Response("Error logging in", { status: 500 });

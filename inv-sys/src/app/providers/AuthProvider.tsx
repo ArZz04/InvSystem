@@ -1,5 +1,11 @@
 "use client";
-import { createContext, useContext, useState, useEffect, ReactNode } from "react";
+import {
+  createContext,
+  useContext,
+  useState,
+  useEffect,
+  ReactNode,
+} from "react";
 import { Role } from "@/app/types";
 
 interface User {
@@ -37,7 +43,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setIsAuthLoaded(true); // <-- indicamos que la carga terminó
   }, []);
 
-  const login = async (username: string, password: string): Promise<boolean> => {
+  const login = async (
+    username: string,
+    password: string,
+  ): Promise<boolean> => {
     setIsLoading(true);
     setError("");
     try {
@@ -77,7 +86,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   return (
-    <AuthContext.Provider value={{ user, token, login, logout, isLoading, isAuthLoaded, error }}>
+    <AuthContext.Provider
+      value={{ user, token, login, logout, isLoading, isAuthLoaded, error }}
+    >
       {children}
     </AuthContext.Provider>
   );
@@ -85,6 +96,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
 export const useAuth = () => {
   const context = useContext(AuthContext);
-  if (!context) throw new Error("useAuth debe usarse dentro de un AuthProvider");
+  if (!context)
+    throw new Error("useAuth debe usarse dentro de un AuthProvider");
   return context;
 };

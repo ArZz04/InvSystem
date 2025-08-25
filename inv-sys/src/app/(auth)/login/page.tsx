@@ -11,10 +11,10 @@ export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false);
 
   const handleLogin = async (e: React.FormEvent) => {
-  e.preventDefault();
-  const success = await login(username, password);
-  if (success) router.push("/dashboard"); // Redirige solo si login exitoso
-};
+    e.preventDefault();
+    const success = await login(username, password);
+    if (success) router.push("/dashboard"); // Redirige solo si login exitoso
+  };
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 p-4 font-sans">

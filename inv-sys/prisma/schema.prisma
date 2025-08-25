@@ -16,6 +16,7 @@ generator client {
 
 model User {
   id          String   @id @default(uuid())
+  n_employee  Int      @unique
   username    String   @unique
   firstName   String
   lastNameP   String
@@ -26,8 +27,18 @@ model User {
   birthYear   Int
   email       String   @unique
   role        Role
+  status      Boolean  @default(true)
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
+}
+
+model InviteCode {
+  id        Int      @id @default(autoincrement())
+  code      String   @unique
+  token     String   @db.VarChar(512) // aumentar a 512 o Text
+  createdAt DateTime @default(now())
+  expiresAt DateTime
+  used      Boolean  @default(false)
 }
 
 enum Role {

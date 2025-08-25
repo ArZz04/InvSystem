@@ -1,15 +1,19 @@
 "use client";
 import { useState } from "react";
-import type React from "react";
 import { useRouter } from "next/navigation";
 
 export default function RegisterPage() {
   const router = useRouter();
   const [username, setUsername] = useState("");
-  const [email, setEmail] = useState("");
+  const [firstName, setFirstName] = useState("");
+  const [lastNameP, setLastNameP] = useState("");
+  const [lastNameM, setLastNameM] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [registrationCode, setRegistrationCode] = useState("");
+  const [birthDay, setBirthDay] = useState<string>("");
+  const [birthMonth, setBirthMonth] = useState<string>("");
+  const [birthYear, setBirthYear] = useState<string>("");
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
@@ -35,12 +39,22 @@ export default function RegisterPage() {
       const res = await fetch("/api/auth/register", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ username, email, password, registrationCode }),
+        body: JSON.stringify({
+          username,
+          firstName,
+          lastNameP,
+          lastNameM,
+          passHash: password,
+          birthDay,
+          birthMonth,
+          birthYear,
+          inviteCode: registrationCode,
+        }),
       });
 
       if (!res.ok) {
-        const text = await res.text();
-        setError(text);
+        const data = await res.json().catch(() => null);
+        setError(data?.message || "Error al registrar el usuario");
         return;
       }
 
@@ -69,7 +83,7 @@ export default function RegisterPage() {
 
         {/* Form */}
         <div className="bg-white rounded-2xl shadow-md border border-gray-200 p-8">
-          <form onSubmit={handleRegister} className="space-y-6">
+          <form onSubmit={handleRegister} className="space-y-4">
             {error && (
               <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded text-sm">
                 {error}
@@ -78,10 +92,7 @@ export default function RegisterPage() {
 
             {/* Username */}
             <div>
-              <label
-                htmlFor="username"
-                className="block text-sm font-medium text-gray-700 mb-1"
-              >
+              <label className="block text-sm font-medium text-gray-700 mb-1">
                 Usuario
               </label>
               <div className="relative">
@@ -89,7 +100,6 @@ export default function RegisterPage() {
                   👤
                 </span>
                 <input
-                  id="username"
                   type="text"
                   placeholder="Ingresa tu usuario"
                   className="w-full pl-10 pr-4 py-3 bg-gray-50 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-300 focus:border-gray-400 transition"
@@ -100,70 +110,75 @@ export default function RegisterPage() {
               </div>
             </div>
 
-            {/* Email */}
+            {/* First Name */}
             <div>
-              <label
-                htmlFor="email"
-                className="block text-sm font-medium text-gray-700 mb-1"
-              >
-                Correo electrónico
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Nombre
               </label>
-              <div className="relative">
-                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
-                  📧
-                </span>
-                <input
-                  id="email"
-                  type="email"
-                  placeholder="Ingresa tu correo"
-                  className="w-full pl-10 pr-4 py-3 bg-gray-50 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-300 focus:border-gray-400 transition"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  required
-                />
-              </div>
+              <input
+                type="text"
+                placeholder="Nombre"
+                className="w-full pl-3 pr-3 py-3 bg-gray-50 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-300 focus:border-gray-400 transition"
+                value={firstName}
+                onChange={(e) => setFirstName(e.target.value)}
+                required
+              />
+            </div>
+
+            {/* Last Name Paterno */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Apellido Paterno
+              </label>
+              <input
+                type="text"
+                placeholder="Apellido Paterno"
+                className="w-full pl-3 pr-3 py-3 bg-gray-50 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-300 focus:border-gray-400 transition"
+                value={lastNameP}
+                onChange={(e) => setLastNameP(e.target.value)}
+                required
+              />
+            </div>
+
+            {/* Last Name Materno */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Apellido Materno
+              </label>
+              <input
+                type="text"
+                placeholder="Apellido Materno"
+                className="w-full pl-3 pr-3 py-3 bg-gray-50 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-300 focus:border-gray-400 transition"
+                value={lastNameM}
+                onChange={(e) => setLastNameM(e.target.value)}
+                required
+              />
             </div>
 
             {/* Registration Code */}
             <div>
-              <label
-                htmlFor="registrationCode"
-                className="block text-sm font-medium text-gray-700 mb-1"
-              >
+              <label className="block text-sm font-medium text-gray-700 mb-1">
                 Código de registro
               </label>
-              <div className="relative">
-                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
-                  🔑
-                </span>
-                <input
-                  id="registrationCode"
-                  type="text"
-                  placeholder="Ingresa tu código"
-                  className="w-full pl-10 pr-4 py-3 bg-gray-50 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-300 focus:border-gray-400 transition"
-                  value={registrationCode}
-                  onChange={(e) => setRegistrationCode(e.target.value)}
-                  required
-                />
-              </div>
+              <input
+                type="text"
+                placeholder="Código de registro"
+                className="w-full pl-3 pr-3 py-3 bg-gray-50 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-300 focus:border-gray-400 transition"
+                value={registrationCode}
+                onChange={(e) => setRegistrationCode(e.target.value)}
+                required
+              />
             </div>
 
             {/* Password */}
             <div>
-              <label
-                htmlFor="password"
-                className="block text-sm font-medium text-gray-700 mb-1"
-              >
+              <label className="block text-sm font-medium text-gray-700 mb-1">
                 Contraseña
               </label>
               <div className="relative">
-                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
-                  🔑
-                </span>
                 <input
-                  id="password"
                   type={showPassword ? "text" : "password"}
-                  placeholder="Ingresa tu contraseña"
+                  placeholder="Contraseña"
                   className="w-full pl-10 pr-12 py-3 bg-gray-50 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-300 focus:border-gray-400 transition"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
@@ -181,20 +196,13 @@ export default function RegisterPage() {
 
             {/* Confirm Password */}
             <div>
-              <label
-                htmlFor="confirmPassword"
-                className="block text-sm font-medium text-gray-700 mb-1"
-              >
+              <label className="block text-sm font-medium text-gray-700 mb-1">
                 Confirmar Contraseña
               </label>
               <div className="relative">
-                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
-                  🔑
-                </span>
                 <input
-                  id="confirmPassword"
                   type={showConfirm ? "text" : "password"}
-                  placeholder="Confirma tu contraseña"
+                  placeholder="Confirmar Contraseña"
                   className="w-full pl-10 pr-12 py-3 bg-gray-50 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-300 focus:border-gray-400 transition"
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
@@ -210,20 +218,50 @@ export default function RegisterPage() {
               </div>
             </div>
 
-            {/* Register Button */}
+            {/* Birth Date */}
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Fecha de Nacimiento
+            </label>
+            <div className="flex gap-2">
+              <input
+                type="number"
+                placeholder="Día"
+                className="w-1/3 p-3 border rounded-lg"
+                value={birthDay}
+                onChange={(e) => setBirthDay(e.target.value)}
+                min={1}
+                max={31}
+                required
+              />
+              <input
+                type="number"
+                placeholder="Mes"
+                className="w-1/3 p-3 border rounded-lg"
+                value={birthMonth}
+                onChange={(e) => setBirthMonth(e.target.value)}
+                min={1}
+                max={12}
+                required
+              />
+              <input
+                type="number"
+                placeholder="Año"
+                className="w-1/3 p-3 border rounded-lg"
+                value={birthYear}
+                onChange={(e) => setBirthYear(e.target.value)}
+                min={1900}
+                max={new Date().getFullYear()}
+                required
+              />
+            </div>
+
+            {/* Submit */}
             <button
               type="submit"
               disabled={isLoading}
               className="w-full bg-gray-800 hover:bg-gray-900 text-white font-medium py-3 rounded-lg transition disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              {isLoading ? (
-                <div className="flex items-center justify-center space-x-2">
-                  <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
-                  <span>Registrando...</span>
-                </div>
-              ) : (
-                "Registrarse"
-              )}
+              {isLoading ? "Registrando..." : "Registrarse"}
             </button>
           </form>
         </div>
