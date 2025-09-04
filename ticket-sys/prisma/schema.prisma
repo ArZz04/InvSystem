@@ -1,0 +1,98 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../src/generated/prisma"
+}
+
+model Ticket {
+  id          Int           @id @default(autoincrement())
+  folio       String        @unique @default(uuid())
+  title       String
+  description String
+  priority    Priority      @default(media)
+  status      TicketStatus  @default(abierto)
+
+  // Usuario que creó el ticket
+  createdBy   User          @relation("UserTickets", fields: [createdById], references: [id])
+  createdById String
+
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+  closedAt    DateTime?
+
+  comments    Comment[]
+}
+
+model Comment {
+  id        Int      @id @default(autoincrement())
+  content   String
+  createdAt DateTime @default(now())
+
+  author    User     @relation("UserComments", fields: [authorId], references: [id])
+  authorId  String
+  ticket    Ticket   @relation(fields: [ticketId], references: [id])
+  ticketId  Int
+}
+
+model User {
+  id          String   @id @default(uuid())
+  n_employee  Int      @unique
+  username    String   @unique
+  firstName   String
+  lastNameP   String
+  lastNameM   String
+  passHash    String
+  birthDay    Int
+  birthMonth  Int
+  birthYear   Int
+  email       String   @unique
+  role        Int
+  status      Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+    // Relación inversa
+  tickets     Ticket[] @relation("UserTickets")    // tickets que creó este usuario
+  comments    Comment[] @relation("UserComments") // comentarios que escribió
+}
+
+model InviteCode {
+  id        Int      @id @default(autoincrement())
+  code      String   @unique
+  token     String   @db.VarChar(512) // aumentar a 512 o Text
+  createdAt DateTime @default(now())
+  expiresAt DateTime
+  used      Boolean  @default(false)
+}
+
+enum Role {
+  Administrador @map("0")
+  Compras       @map("1")
+  Encargado     @map("2")
+  Cajero        @map("3")
+}
+
+enum Priority {
+  baja
+  media
+  alta
+  critica
+}
+
+enum TicketStatus {
+  abierto
+  en_progreso
+  resuelto
+  cerrado
+}
+
